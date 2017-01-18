@@ -15,35 +15,24 @@
 
 #define BUT1 10
 
-typedef struct
-{
-	int idNum;
-	int status;
-}lights;
-
-int toggle(lights light);
+int toggle(int status);
 
 int main(void)
 {
 	printf("Initializing\n");
 	wiringPiSetup();
-	lights array[] = {
-		{GPIO1, 0},
-		{GPIO2, 0},
-		{GPIO3, 0},
-		{GPIO4, 0},
-		{GPIO5, 0},
-		{GPIO6, 0},
-		{GPIO7, 0},
-		{GPIO8, 0}
-	};
+	//Layout of array is Pin number, status value (0 == off, 1 == on)
+	int array[] = { GPIO1, 0, GPIO2, 0, GPIO3, 0,
+					GPIO4, 0, GPIO5, 0, GPIO6, 0, 
+					GPIO7, 0, GPIO8, 0
+					};
 	int i = 0;
 	printf("Configuring Pins\n");
-	while(i < LIGHT_NUM)
+	while(i < LIGHT_NUM * 2)
 	{
-		pinMode(array[i].idNum, OUTPUT);
-		digitalWrite(array[i].idNum, LOW); delay(100);
-		++i;
+		pinMode(array[i], OUTPUT);
+		digitalWrite(array[i], LOW); delay(100);
+		i = i + 2;
 	}
 	
 	//counter variable for array location
@@ -51,30 +40,32 @@ int main(void)
 	printf("Toggling Pins\n");
 	for(;;)
 	{
-		if(toggle(array[j]) == 1)
+		array[j+1] = toggle(array[j+1]);
+		if(array[j+1] == 1)
 		{
-			digitalWrite(array[j].idNum, HIGH); delay(500);
+			digitalWrite(array[j], HIGH); delay(500);
 		}
 		else
 		{
-			digitalWrite(array[j].idNum, LOW); delay(500);
+			digitalWrite(array[j], LOW); delay(500);
 		}
-		++j;
-		if(j == LIGHT_NUM)
+
+		j = j + 2;
+		if(j == LIGHT_NUM * 2)
 			j = 0;
 		else if(j == -1)
-			j = LIGHT_NUM - 1;
+			j = (LIGHT_NUM * 2) - 1;
 	}
 
 	return 1;
 }
 
-int toggle(lights light)
+int toggle(int status)
 {
-	if(light.status == 1)
-		light.status = 0;
+	if(status == 1)
+		status = 0;
 	else
-		light.status = 1;
+		status = 1;
 
-	return light.status;
+	return status;
 }
