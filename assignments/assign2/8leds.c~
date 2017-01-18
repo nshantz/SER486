@@ -4,16 +4,16 @@
 //maximum number of lights available
 #define LIGHT_NUM 8
 
-#define GPIO1 0
-#define GPIO2 2
-#define GPIO3 3
-#define GPIO4 12
+#define GPIO1 17
+#define GPIO2 27
+#define GPIO3 22
+#define GPIO4 5
 #define GPIO5 6
-#define GPIO6 5
-#define GPIO7 4
-#define GPIO8 1
+#define GPIO6 13
+#define GPIO7 19
+#define GPIO8 26
 
-#define BUT1 10
+#define BUT1 18
 
 typedef struct
 {
