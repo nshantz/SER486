@@ -13,3 +13,5 @@ credit where applicable.
 Hopefully these pieces of software are useful in understanding programming in the C language for the Raspberry Pi. 
 
 Happy Coding!
+
+-Nathaniel Shantz
