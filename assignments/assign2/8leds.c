@@ -21,6 +21,8 @@ unsigned long prev_interrupt_time = 0;
 //interupt handler changes direction of lights
 void ISR(void)
 {
+	//code to add delay between interupts came from:
+	//http://raspberrypi.stackexchange.com/questions/8544/gpio-interrupt-debounce
 	unsigned long interrupt_time = millis();
 	if(interrupt_time - prev_interrupt_time > 300)
 	{
@@ -67,6 +69,10 @@ int main(void)
 	printf("Toggling Pins\n");
 	//0 = increase counter variable, 1 = decrease counter variable
 	direction = 0;
+	
+	//toggle first pin before starting loop (allows toggle function to work
+	//properly
+	//digitalWrite(GPIO1, HIGH); delay(500);
 	for(;;)
 	{
 		
@@ -104,9 +110,16 @@ int main(void)
 //this section inverts status value
 int toggle(int status)
 {
-	if(status == 1)
-		status = 0;
+	//this prevents lights from being off/on opposite of the chain.
+	//int prev_led;
+	if(direction == 0)
+		prev_led = status-2;
 	else
+		prev_led = status+2;
+
+	if(status == 1 )//&& prev_led == 0)
+		status = 0;
+	else if (status == 0 )//&& prev_led == 1)
 		status = 1;
 
 	return status;
