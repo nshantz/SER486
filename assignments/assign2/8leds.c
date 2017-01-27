@@ -14,6 +14,22 @@
 #define GPIO8 1
 //button pin location
 #define BUT1 7
+
+//value to handle direction of lights
+int direction;
+//interupt handler changes direction of lights
+void ISR(void)
+{
+	printf("Button Pressed\n");
+	if (!direction)
+		direction = 0;
+	else if(direction == 1)
+		direction = 0;
+	else
+		direction = 1;
+}
+
+
 //function to toggle light on and off
 int toggle(int status);
 
@@ -35,12 +51,26 @@ int main(void)
 		digitalWrite(array[i], LOW); delay(100);
 		i = i + 2;
 	}
-	
+	//initialize interupt routine
+	if( wiringPiISR(BUT1, INT_EDGE_FALLING, &ISR) < 0)
+	{
+		printf("Unable to set Interupt");
+		return 1;
+	}
 	//counter variable for array location
-	int j = 0;
+	int j = -2;
 	printf("Toggling Pins\n");
+	//0 = increase counter variable, 1 = decrease counter variable
+	direction = 0;
 	for(;;)
 	{
+		
+		//skipping by 2 to access the next pin and not the status pin
+		if(direction == 0)
+			j = j+2;
+		else
+			j = j-2;
+			
 		//toggle status value for LED
 		array[j+1] = toggle(array[j+1]);
 		//if 1, turn LED high
@@ -54,12 +84,10 @@ int main(void)
 			digitalWrite(array[j], LOW); delay(500);
 		}
 
-		//skipping by 2 to access the next pin and not the status pin
-		j = j + 2;
 		//since there are two values per pin, the max number must be multiplied by 2
 		//if number is twice the max, then the loop starts back at 0
 		if(j == LIGHT_NUM * 2)
-			j = 0;
+			j = -2;
 		//if number is below 0, then the loop starts back at the tail of the loop
 		else if(j == -1)
 			j = (LIGHT_NUM * 2) - 1;
