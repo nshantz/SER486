@@ -17,16 +17,21 @@
 
 //value to handle direction of lights
 int direction;
+unsigned long prev_interrupt_time = 0;
 //interupt handler changes direction of lights
 void ISR(void)
 {
-	printf("Button Pressed\n");
-	if (!direction)
-		direction = 0;
-	else if(direction == 1)
-		direction = 0;
-	else
-		direction = 1;
+	unsigned long interrupt_time = millis();
+	if(interrupt_time - prev_interrupt_time > 300)
+	{
+		if(direction == 1)
+			direction = 0;
+		else if(direction == 0)
+			direction = 1;
+		else
+			direction = 0;
+	}
+	prev_interrupt_time = interrupt_time;
 }
 
 
@@ -68,7 +73,7 @@ int main(void)
 		//skipping by 2 to access the next pin and not the status pin
 		if(direction == 0)
 			j = j+2;
-		else
+		else if (direction == 1)
 			j = j-2;
 			
 		//toggle status value for LED
@@ -89,8 +94,8 @@ int main(void)
 		if(j == LIGHT_NUM * 2)
 			j = -2;
 		//if number is below 0, then the loop starts back at the tail of the loop
-		else if(j == -1)
-			j = (LIGHT_NUM * 2) - 1;
+		else if(j < 0)
+			j = (LIGHT_NUM * 2);
 	}
 
 	return 1;
