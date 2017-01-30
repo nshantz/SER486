@@ -38,7 +38,7 @@ void ISR(void)
 
 
 //function to toggle light on and off
-int toggle(int status);
+int toggle(int status, int location);
 
 int main(void)
 {
@@ -83,7 +83,7 @@ int main(void)
 			j = j-2;
 			
 		//toggle status value for LED
-		array[j+1] = toggle(array[j+1]);
+		array[j+1] = toggle(array[j+1], j);
 		//if 1, turn LED high
 		if(array[j+1] == 1)
 		{
@@ -108,18 +108,61 @@ int main(void)
 }
 //insert the status value to read in
 //this section inverts status value
-int toggle(int status)
+int toggle(int status, int location)
 {
 	//this prevents lights from being off/on opposite of the chain.
-	//int prev_led;
+	int prev_led;
+	int next_led;
+	//TODO: this doesn't check for the edge lights
 	if(direction == 0)
-		prev_led = status-2;
-	else
-		prev_led = status+2;
+	{
+		//if at the end, next led is starting at opposite side
+		if(location == LIGHT_NUM *2)
+		{
+			next_led = 1;
+			prev_led = status-2;
+		}
+		//if at the beginning of the loop, prev is at the end of the line
+		else if(location == 0)
+		{
+			next_led = status+2;
+			prev_led = (LIGHT_NUM*2)-1;
+		}
+		//this is the standard in the middle of cycle
+		else
+		{
+			next_led = status+2;
+			prev_led = status-2;
+		}
 
-	if(status == 1 )//&& prev_led == 0)
+	}
+	else if(direction == 1)
+	{
+		//if at end of loop, start at opposing side
+		if(location == 0)
+		{
+			next_led = (LIGHT_NUM*2)-1;
+			prev_led = status+2;
+		}
+		else if(location == LIGHT_NUM *2)
+		{
+			prev_led = 1;
+			next_led = status-2;
+		}
+		else
+		{
+			prev_led = status+2;
+			next_led = status-2;
+		}
+	}
+
+	if(prev_led == 0 && next_led == 0)
+		status = 1;
+	else if(prev_led == 1 && next_led == 1)
 		status = 0;
-	else if (status == 0 )//&& prev_led == 1)
+	else if(/*status == 1*/prev_led == 0)
+		status = 0;
+	else if (/*status == 0*/prev_led == 1)
 		status = 1;
 
 	return status;
