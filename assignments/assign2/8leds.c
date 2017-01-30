@@ -156,14 +156,16 @@ int toggle(int status, int location)
 		}
 	}
 
-	if(prev_led == 0 && next_led == 0)
+	/*if(prev_led == 0 && next_led == 0)
 		status = 1;
 	else if(prev_led == 1 && next_led == 1)
 		status = 0;
-	else if(/*status == 1*/prev_led == 0)
+	else */if(/*status == 1*/prev_led == 0)
 		status = 0;
 	else if (/*status == 0*/prev_led == 1)
 		status = 1;
+	else
+		printf("Error toggling light\n");
 
 	return status;
 }
