@@ -110,13 +110,6 @@ int main(void)
 //this section inverts status value
 int toggle(int status)
 {
-	//this prevents lights from being off/on opposite of the chain.
-	//int prev_led;
-	/*if(direction == 0)
-		prev_led = status-2;
-	else
-		prev_led = status+2;
-	*/
 	if(status == 1 )//&& prev_led == 0)
 		status = 0;
 	else if (status == 0 )//&& prev_led == 1)
