@@ -42,6 +42,7 @@ int toggle(int status);
 
 int main(void)
 {
+/********** Initialization *********/
 	printf("Initializing\n");
 	wiringPiSetup();
 	//Layout of array is Pin number, status value (0 == off, 1 == on)
@@ -51,6 +52,7 @@ int main(void)
 					};
 	//initializing all lights to off				
 	int i = 0;
+/********** Configuration **********/
 	printf("Configuring Pins\n");
 	while(i < LIGHT_NUM * 2)
 	{
@@ -70,9 +72,7 @@ int main(void)
 	//0 = increase counter variable, 1 = decrease counter variable
 	direction = 0;
 	
-	//toggle first pin before starting loop (allows toggle function to work
-	//properly
-	//digitalWrite(GPIO1, HIGH); delay(500);
+/********** Implementation *********/
 	for(;;)
 	{
 		
@@ -110,9 +110,9 @@ int main(void)
 //this section inverts status value
 int toggle(int status)
 {
-	if(status == 1 )//&& prev_led == 0)
+	if(status == 1 )
 		status = 0;
-	else if (status == 0 )//&& prev_led == 1)
+	else if (status == 0 )
 		status = 1;
 
 	return status;
