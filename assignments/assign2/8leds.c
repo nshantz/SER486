@@ -38,7 +38,17 @@ void ISR(void)
 
 
 //function to toggle light on and off
-int toggle(int status);
+//insert the status value to read in
+//this section inverts status value
+int toggle(int status)
+{
+	if(status == 1 )
+		status = 0;
+	else if (status == 0 )
+		status = 1;
+
+	return status;
+}
 
 int main(void)
 {
@@ -105,15 +115,4 @@ int main(void)
 	}
 
 	return 1;
-}
-//insert the status value to read in
-//this section inverts status value
-int toggle(int status)
-{
-	if(status == 1 )
-		status = 0;
-	else if (status == 0 )
-		status = 1;
-
-	return status;
 }
