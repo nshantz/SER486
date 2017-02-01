@@ -29,8 +29,6 @@ void ISR(void)
 		if(direction == 1)
 			direction = 0;
 		else if(direction == 0)
-			direction = 1;
-		else
 			direction = 0;
 	}
 	prev_interrupt_time = interrupt_time;
