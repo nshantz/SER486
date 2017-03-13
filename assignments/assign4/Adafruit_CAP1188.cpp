@@ -14,7 +14,8 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
-#include "Adafruit_CAP1188.h"
+#include "Adafruit_CAP1188.hpp"
+#include "wrapper.h"
 
 // If the SPI library has transaction support, these functions
 // establish settings and protect from interference from other
@@ -64,7 +65,7 @@ Adafruit_CAP1188::Adafruit_CAP1188(int8_t clkpin, int8_t misopin,
   _i2c = false;
 }
 
-boolean Adafruit_CAP1188::begin(uint8_t i2caddr) {
+bool Adafruit_CAP1188::begin(uint8_t i2caddr) {
   if (_i2c) {
 
 	wiringPiI2CSetup(i2caddr);    
@@ -108,13 +109,13 @@ boolean Adafruit_CAP1188::begin(uint8_t i2caddr) {
   
   // Useful debugging info
   
-  Serial.print("Product ID: 0x");
+/*  Serial.print("Product ID: 0x");
   Serial.println(readRegister(CAP1188_PRODID), HEX);
   Serial.print("Manuf. ID: 0x");
   Serial.println(readRegister(CAP1188_MANUID), HEX);
   Serial.print("Revision: 0x");
   Serial.println(readRegister(CAP1188_REV), HEX);
-  
+*/  
 
   if ( (readRegister(CAP1188_PRODID) != 0x50) ||
        (readRegister(CAP1188_MANUID) != 0x5D) ||
@@ -150,7 +151,7 @@ void Adafruit_CAP1188::LEDpolarity(uint8_t x) {
 uint8_t Adafruit_CAP1188::spixfer(uint8_t data) {
   if (_clk == -1) {
    //Serial.println("Hardware SPI");
-    return SPI.transfer(data);
+//    return SPI.transfer(data);
   } else {
    // Serial.println("Software SPI");
     uint8_t reply = 0;
@@ -237,4 +238,19 @@ void Adafruit_CAP1188::writeRegister(uint8_t reg, uint8_t value) {
       }
 #endif
   }*/
+}
+
+//TODO Enable SPI Wrapper
+
+//wrapper for I2C constructor
+extern "C" void* call_CAP1188_I2C (int8_t i){
+	Adafruit_CAP1188* out = new Adafruit_CAP1188(i);
+	return(reinterpret_cast<void*>(out));
+}
+//wrapper for detecting touched
+extern "C" uint8_t call_CAP1188_touched(void* p){
+	return reinterpret_cast<Adafruit_CAP1188*>(p)->touched();
+}
+extern "C" bool call_CAP1188_begin(void* p, uint8_t i){
+	return reinterpret_cast<Adafruit_CAP1188*>(p)->begin(i);
 }
