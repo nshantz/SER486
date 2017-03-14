@@ -1,6 +1,6 @@
 /*
 	Author: Nathaniel Shantz
-	Description: Read the readme packaged with this
+	Description: This is an adaptation of the Adafruit CAP1188 example program originally written for arduino
 */
 #include <string.h>
 #include <stdio.h>
@@ -31,7 +31,7 @@ int initialize(){
 }
 
 int main(){
-	//if initialize fails, 
+	//if initialize fails, end program
 	if(!initialize){
 		printf("%s\n","Error: can't run program");
 		return 0;
@@ -39,8 +39,9 @@ int main(){
 	
 	uint8_t touched;
 	while(1){
+		//returns value of buttons that are touched
 		touched = call_CAP1188_touched(sensor);
-		
+		//if touched, cycle through all values and print the pins that are touched
 		if(touched != 0){
 			uint8_t i = 0;
 			for(i < 8; i++;){
