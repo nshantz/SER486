@@ -14,8 +14,7 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
-#include "Adafruit_CAP1188.hpp"
-#include "wrapper.h"
+#include "Adafruit_CAP1188.h"
 
 // If the SPI library has transaction support, these functions
 // establish settings and protect from interference from other
@@ -66,27 +65,18 @@ Adafruit_CAP1188::Adafruit_CAP1188(int8_t clkpin, int8_t misopin,
 }
 
 bool Adafruit_CAP1188::begin(uint8_t i2caddr) {
-  if (_i2c) {
+	if (_i2c) {
 
-	wiringPiI2CSetup(i2caddr);    
+		wiringPiI2CSetup(i2caddr);    
 
-    _i2caddr = i2caddr;
-  } 
+		_i2caddr = i2caddr;
+	} 
 	//TODO: Enable SPI
-	/*else if (_clk == -1) {
+	else if (_clk == -1) {
     // Hardware SPI
-    digitalWrite(_cs, HIGH);
-#ifdef SPI_HAS_TRANSACTION
-      SPI.begin();
-#else
-      SPCRback = SPCR;
-      SPI.begin();
-      SPI.setClockDivider(SPI_CLOCK_DIV8);
-      SPI.setDataMode(SPI_MODE0);
-      mySPCR = SPCR;
-      SPCR = SPCRback;
-#endif
-  } else {
+    	//digitalWrite(_cs, HIGH);
+		wiringPiSPISetup(_cs, 2000000);
+  	} /*else {
     // Sofware SPI
     pinMode(_clk, OUTPUT);
     pinMode(_mosi, OUTPUT);
@@ -105,7 +95,7 @@ bool Adafruit_CAP1188::begin(uint8_t i2caddr) {
     delay(100);
   }
 
-  readRegister(CAP1188_PRODID);
+//  readRegister(CAP1188_PRODID);
   
   // Useful debugging info
   
@@ -122,6 +112,7 @@ bool Adafruit_CAP1188::begin(uint8_t i2caddr) {
        (readRegister(CAP1188_REV) != 0x83)) {
     return false;
   }
+
   // allow multiple touches
   writeRegister(CAP1188_MTBLK, 0); 
   // Have LEDs follow touches
@@ -151,15 +142,18 @@ void Adafruit_CAP1188::LEDpolarity(uint8_t x) {
 uint8_t Adafruit_CAP1188::spixfer(uint8_t data) {
   if (_clk == -1) {
    //Serial.println("Hardware SPI");
+   	  unsigned char* regData = &data;
+	  wiringPiSPIDataRW(_cs, regData, 8); delay(200);
+	  return (uint8_t)*regData;
 //    return SPI.transfer(data);
   } else {
    // Serial.println("Software SPI");
     uint8_t reply = 0;
     for (int i=7; i>=0; i--) {
       reply <<= 1;
-      digitalWrite(_clk, LOW);
-      digitalWrite(_mosi, data & (1<<i));
-      digitalWrite(_clk, HIGH);
+      digitalWrite(_clk, LOW); delay(200);
+      digitalWrite(_mosi, data & (1<<i)); delay(200);
+      digitalWrite(_clk, HIGH); delay(200);
       if (digitalRead(_miso)) 
 	reply |= 1;
     }
@@ -172,33 +166,18 @@ uint8_t Adafruit_CAP1188::readRegister(uint8_t reg) {
     return wiringPiI2CReadReg8(_i2c, reg);
   } 
 	//TODO: Enable SPI
-	/*else {
-#ifdef SPI_HAS_TRANSACTION
-      spi_begin();
-#else
-    if (_clk == -1) {
-      SPCRback = SPCR;
-      SPCR = mySPCR;
-    }
-#endif
-    digitalWrite(_cs, LOW);
-    // set address
-    spixfer(0x7D);
-    spixfer(reg);
-    digitalWrite(_cs, HIGH);
-    digitalWrite(_cs, LOW);
-    spixfer(0x7F);
-    uint8_t reply = spixfer(0); 
-    digitalWrite(_cs, HIGH);
-#ifdef SPI_HAS_TRANSACTION
-      spi_end();
-#else
-      if (_clk == -1) {
-          SPCR = SPCRback;
-      }
-#endif
-    return reply;
-  }  */
+	else {
+ 	   //digitalWrite(_cs, LOW);
+	   // set address
+	   spixfer(0x7D);
+	   spixfer(reg);
+	   //digitalWrite(_cs, HIGH);
+	   //digitalWrite(_cs, LOW);
+	   spixfer(0x7F);
+	   uint8_t reply = spixfer(0); 
+	   //digitalWrite(_cs, HIGH);
+       return reply;
+  }
 }
 
 
@@ -212,45 +191,33 @@ void Adafruit_CAP1188::writeRegister(uint8_t reg, uint8_t value) {
 		wiringPiI2CWriteReg8(_i2c, reg, value);    
 	} 
 	//TODO: Enable SPI
-	/*else {
-#ifdef SPI_HAS_TRANSACTION
-      spi_begin();
-#else
-      if (_clk == -1) {
-          SPCRback = SPCR;
-          SPCR = mySPCR;
-      }
-#endif
-    digitalWrite(_cs, LOW);
-    // set address
-    spixfer(0x7D);
-    spixfer(reg);
-    digitalWrite(_cs, HIGH);
-    digitalWrite(_cs, LOW);
-    spixfer(0x7E);
-    spixfer(value);
-    digitalWrite(_cs, HIGH);
-#ifdef SPI_HAS_TRANSACTION
-      spi_end();
-#else
-      if (_clk == -1) {
-        SPCR = SPCRback;
-      }
-#endif
-  }*/
+	else {
+    	//digitalWrite(_cs, LOW);
+    	// set address
+    	spixfer(0x7D);
+    	spixfer(reg);
+    	//digitalWrite(_cs, HIGH);
+    	//digitalWrite(_cs, LOW);
+    	spixfer(0x7E);
+    	spixfer(value);
+    	//digitalWrite(_cs, HIGH);
+	}
 }
 
-//TODO Enable SPI Wrapper
 
 //wrapper for I2C constructor
 extern "C" void* call_CAP1188_I2C (int8_t i){
-	Adafruit_CAP1188* out = new Adafruit_CAP1188(i);
-	return(reinterpret_cast<void*>(out));
+	return new Adafruit_CAP1188(i);
 }
+
 //wrapper for detecting touched
 extern "C" uint8_t call_CAP1188_touched(void* p){
 	return reinterpret_cast<Adafruit_CAP1188*>(p)->touched();
 }
 extern "C" bool call_CAP1188_begin(void* p, uint8_t i){
 	return reinterpret_cast<Adafruit_CAP1188*>(p)->begin(i);
+}
+
+extern "C" void* call_CAP1188_SPI(int8_t cspin, int8_t resetpin){
+	return new Adafruit_CAP1188(cspin, resetpin);
 }

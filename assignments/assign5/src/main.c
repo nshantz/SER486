@@ -2,15 +2,14 @@
 	Author: Nathaniel Shantz
 	Description: This is an adaptation of the Adafruit CAP1188 example program originally written for arduino
 */
-#include <string.h>
-#include <stdio.h>
-#include "wrapper.h"
+#include "Adafruit_CAP1188.h"
 
 //used to hard-reset the sensor
-#define RESET 7
+#define RESET 1
 //communication channels for I2C
-#define SDA 8
-#define SCL 9
+#define MOSI 12
+#define MISO 13
+#define CS 10
 
 //Running I2C with reset enabled
 void* sensor;
@@ -18,7 +17,7 @@ void* sensor;
 int initialize(){
 	printf("%s\n","Initializing CAP1188 Touch Sensor");
 	wiringPiSetup();
-	sensor = call_CAP1188_I2C(RESET);
+	sensor = call_CAP1188_SPI(CS, RESET);
 	//hardware address is 0x28 based on specs
 	if(!call_CAP1188_begin(sensor, 0x28)){
 		printf("%s\n","Error: Device not found");

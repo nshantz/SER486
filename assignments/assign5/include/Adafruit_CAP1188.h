@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 // The default I2C address
 #define CAP1188_I2CADDR 0x29
@@ -71,6 +72,8 @@ class Adafruit_CAP1188 {
 void* call_CAP1188_I2C(int8_t i);
 uint8_t call_CAP1188_touched(void* p);
 bool call_CAP1188_begin(void* p, uint8_t i);
+void* call_CAP1188_SPI(int8_t cspin, int8_t resetpin);
+
 
 #ifdef __cplusplus
 	}
