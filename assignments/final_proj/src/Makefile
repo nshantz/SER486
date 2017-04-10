@@ -10,7 +10,7 @@ LIBS=-lwiringPi
 _DEPS = Adafruit_C_ADS1X15.h
 DEPS = $(patsubst %, $(IDIR)/%, $(_DEPS))
 
-_OBJ = main.o Adafruit_CAP1188.o
+_OBJ = main.o Adafruit_C_ADS1X15.o
 OBJ = $(patsubst %, $(ODIR)/%, $(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)
