@@ -125,24 +125,21 @@ static uint8_t i2cread(void* obj){
 }
 
 static void i2cwrite(int i2cAddress, uint8_t x){
-	//TODO: Insert right code based on struct values
-	printf("Entered i2cWrite function\n");
+	//printf("Entered i2cWrite function\n");
 	wiringPiI2CWrite(i2cAddress, (int)x);
 }
 
 static void writeRegister(int i2cAddress, uint8_t reg, uint16_t value){
-	//TODO: Insert write code for registers with I2C protocol
 	wiringPiI2CWriteReg16(i2cAddress, (int) reg, (int) (((value & 0x00FF) << 8) | (value & 0xFF00) >> 8));
-	delay(200);
 }
 
 static uint16_t readRegister(int i2cAddress, uint8_t reg){
-	//TODO: Insert Read code for registers with I2C protocol
-	printf("Entered readRegister function\n");
+	//printf("Entered readRegister function\n");
 	i2cwrite(i2cAddress, ADS1015_REG_POINTER_CONVERT);
-	printf("Completed i2cWrite function\n");
+	//printf("Completed i2cWrite function\n");
 	uint16_t tmp = (uint16_t)wiringPiI2CReadReg16(i2cAddress, (int) reg);
-	printf("wiringPiRead function completed\n");
+
+	//printf("wiringPiRead function completed\n");
 	return tmp;
 	//return (uint16_t)wiringPiI2CReadReg16( i2cAddress, (int) reg);
 }
@@ -150,10 +147,9 @@ static uint16_t readRegister(int i2cAddress, uint8_t reg){
 //instantiates the struct to fit your choice
 void initModule_default(int choice, struct Adafruit_ADS1115* obj){
 	printf("Initializing ADS with default...\n");
-	obj = malloc(sizeof(struct Adafruit_ADS1115));
+//	obj = malloc(sizeof(struct Adafruit_ADS1115));
 	printf("Wrapping the pointer\n");
 	if(choice == 0){
-		//TODO: Write Code for 1015 inita
 		printf("Trying to init the 10115\n");
 		obj->m_i2cAddress = ADS1015_ADDRESS;
 		obj->m_conversionDelay = ADS1015_CONVERSIONDELAY;
@@ -162,10 +158,8 @@ void initModule_default(int choice, struct Adafruit_ADS1115* obj){
 	}
 	else if(choice == 1){
 		printf("Trying to init the 1115\n");
-		uint8_t address = ADS1015_ADDRESS;
-		uint8_t cDelay = ADS1115_CONVERSIONDELAY;
-		obj->m_i2cAddress = address;
-		obj->m_conversionDelay = cDelay;
+		obj->m_i2cAddress = ADS1015_ADDRESS;
+		obj->m_conversionDelay = ADS1115_CONVERSIONDELAY;
 		obj->m_bitShift = 0;
 		obj->m_gain = GAIN_TWOTHIRDS; /* +/- 6.144v range (limited to VDD +0.3V max!) */
 	}
@@ -178,14 +172,12 @@ void initModule_default(int choice, struct Adafruit_ADS1115* obj){
 void initModule_Address(int choice, uint8_t i2cAddress, struct Adafruit_ADS1115* obj){
 
 	if(choice == 0){
-		//TODO: Write Code for 1015 init
 		obj->m_i2cAddress = i2cAddress;
 		obj->m_conversionDelay = ADS1015_CONVERSIONDELAY;
 		obj->m_bitShift = 4;
 		obj->m_gain = GAIN_TWOTHIRDS; /* +/- 6.144V range (limited to VDD +0.3V max!) */
 	}
 	else if(choice == 1){
-		//TODO: Write code for 1115 init
 		obj->m_i2cAddress = i2cAddress;
 		obj->m_conversionDelay = ADS1115_CONVERSIONDELAY;
 		obj->m_bitShift = 0;
@@ -197,7 +189,6 @@ void initModule_Address(int choice, uint8_t i2cAddress, struct Adafruit_ADS1115*
 }
 //sets up the HW (reads coefficients values, etc.)
 void begin(struct Adafruit_ADS1115* obj){
-	//TODO: Write code to begin WiringPi
 	printf("Setting up wiringPi library\n");
 	wiringPiSetup();
 	printf("Trying to assign the wiringPiAddress to the wrapping pointer...\n");
@@ -218,7 +209,7 @@ uint16_t readADC_SingleEnded(struct Adafruit_ADS1115* obj, uint8_t channel){
 	if(channel > 3){
 		return 0;
 	}
-	printf("Entered SingleEnded function...\n");
+	//printf("Entered SingleEnded function...\n");
 	//starting with default values
 	uint16_t config = ADS1015_REG_CONFIG_CQUE_NONE		| //Disable the comparator (default)
 					  ADS1015_REG_CONFIG_CLAT_NONLAT 	| //Non-latching (default)
@@ -249,17 +240,17 @@ uint16_t readADC_SingleEnded(struct Adafruit_ADS1115* obj, uint8_t channel){
 	//set 'start sngle-conversion' bit
 	config |= ADS1015_REG_CONFIG_OS_SINGLE;
 	
-	printf("Attempting to write config settings to config register\n");
+	//printf("Attempting to write config settings to config register\n");
 
 	//write config register to the ADC
 	writeRegister(obj->m_wiringPiAddress, ADS1015_REG_POINTER_CONFIG, config);
 
-	printf("Successfully wrote config settings\n");
+	//printf("Successfully wrote config settings\n");
 
 	//Wait for the conversion to complete
 	delay(obj->m_conversionDelay);
 
-	printf("Attempting to read conversion results\n");
+	//printf("Attempting to read conversion results\n");
 	//Read the conversion results
 	//shift 12-bit results right 4 bits for the ADS1015
 	return readRegister(obj->m_wiringPiAddress, ADS1015_REG_POINTER_CONVERT) >> obj->m_bitShift;
